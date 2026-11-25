@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>VMware Licensing Planner</title>
+  <link rel="stylesheet" href="./styles.css">
+  
+  
+  <script src="./xlsx.full.min.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body class="dashboard-home dashboard-light">
+  <main class="wrap lic-wrap">
+    <header class="lic-header">
+      
+      <div class="lic-headline"><div><p class="eyebrow">CAPACITY PLANNING</p><h1>VMware licensing planner</h1><p id="subtitle">Compare VMware Foundation licensing from RVTools exports. Files are read in this browser only.</p></div></div>
+    </header>
+
+    <section id="sessionWorkspace">
+      <section class="lic-panel upload-panel">
+        <div class="section-heading"><div><span class="step">01</span><h2>Load RVTools exports</h2></div><div class="upload-actions"><span class="local-badge">NOT UPLOADED OR SAVED</span><button class="secondary-button" id="clearSession" type="button">Clear session</button></div></div>
+        <p class="section-copy">Choose one or more RVTools workbooks. They are parsed locally and kept only in this page session; refreshing or closing the page clears them.</p>
+        <div class="project-controls import-controls"><label>vCenter name <span class="optional-label">override when RVTools metadata is unavailable</span><input id="vcenterName" type="text" placeholder="Uses vMetaData → Server when present"></label><label class="file-picker">Choose RVTools workbook(s)<input id="rvFile" type="file" multiple accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label></div>
+        <div id="statusMessage" class="status-message" role="status">Nothing leaves your device. The vCenter identifier is read from vMetaData → Server; vInfo or the filename is used only if that value is unavailable.</div>
+        <div class="import-list"><div class="section-heading"><h3>Loaded exports</h3><span id="importCount" class="source-label"></span></div><div class="table-scroll"><table><thead><tr><th>VCENTER</th><th>vCenter version</th><th>Collected</th><th>RVTOOLS VERSION</th><th>Hosts</th></tr></thead><tbody id="importsRows"></tbody></table></div></div>
+      </section>
+
+      <section class="lic-panel filter-panel">
+        <div class="section-heading"><div><span class="step">02</span><h2>Inventory scope</h2></div><button class="text-button" id="selectAllFilters" type="button">Select all</button></div>
+        <p class="section-copy">Choose which inventory contributes to the estimate. Each filter supports multi-select; downstream lists update with the current selection.</p>
+        <div class="filter-grid"><fieldset><legend>vCenters</legend><div id="vcenterFilters" class="filter-options"></div></fieldset><fieldset><legend>Clusters</legend><div id="clusterFilters" class="filter-options"></div></fieldset><fieldset><legend>Hosts</legend><div id="hostFilters" class="filter-options"></div></fieldset></div>
+      </section>
+
+      <div id="results" class="is-hidden">
+        <div class="summary-grid">
+          <article class="metric-card metric-primary"><span>Hosts to license</span><strong id="hostCount">—</strong><small>selected host inventory</small></article>
+          <article class="metric-card"><span>Physical sockets</span><strong id="socketCount">—</strong><small>selected hosts</small></article>
+          <article class="metric-card"><span>Physical cores</span><strong id="actualCoreCount">—</strong><small>reported by RVTools</small></article>
+          <article class="metric-card metric-primary"><span>Core licenses</span><strong id="licensedCoreCount">—</strong><small>16-core minimum per socket</small></article>
+        </div>
+        <section class="lic-panel product-panel">
+          <div class="section-heading"><div><span class="step">03</span><h2>Compare foundation options</h2></div><span id="sourceLabel" class="source-label"></span></div>
+          <p class="section-copy">Both offers use the same calculated core count. vSAN entitlement and annual subscription pricing differ; enter raw cluster TiB below to estimate any add-on requirement.</p>
+          <div class="product-grid">
+            <article class="product-card vvf"><div class="product-title"><span class="product-mark">V</span><div><h3>vSphere Foundation</h3><p>VVF · core subscription</p></div></div><strong class="product-cores" id="vvfCores">—</strong><span class="unit-label">core licenses required</span><div class="entitlement"><span>Included vSAN entitlement</span><b id="vvfEntitlement">—</b></div><div class="entitlement"><span>Estimated vSAN add-on</span><b id="vvfAddon">—</b></div><div class="entitlement price-detail"><span>Annual price / core · VCF-VSP-FND-B</span><b id="vvfUnitPrice">—</b></div><div class="entitlement price-detail"><span>Annual core subscription estimate</span><b id="vvfCoreSubtotal">—</b></div><div class="entitlement price-detail"><span>Annual vSAN add-on estimate</span><b id="vvfVsanSubtotal">—</b></div><div class="entitlement price-total"><span>Estimated annual total</span><b id="vvfAnnualTotal">—</b></div></article>
+            <article class="product-card vcf"><div class="product-title"><span class="product-mark">C</span><div><h3>VMware Cloud Foundation</h3><p>VCF · core subscription</p></div></div><strong class="product-cores" id="vcfCores">—</strong><span class="unit-label">core licenses required</span><div class="entitlement"><span>Included vSAN entitlement</span><b id="vcfEntitlement">—</b></div><div class="entitlement"><span>Estimated vSAN add-on</span><b id="vcfAddon">—</b></div><div class="entitlement price-detail"><span>Annual price / core · VCF-CLD-FND-B</span><b id="vcfUnitPrice">—</b></div><div class="entitlement price-detail"><span>Annual core subscription estimate</span><b id="vcfCoreSubtotal">—</b></div><div class="entitlement price-detail"><span>Annual vSAN add-on estimate</span><b id="vcfVsanSubtotal">—</b></div><div class="entitlement price-total"><span>Estimated annual total</span><b id="vcfAnnualTotal">—</b></div></article>
+          </div>
+          <div class="formula-note"><b>Capacity math</b><span>VVF: 0.25 TiB/core, rounded up. VCF: 1 TiB/core. Entitlement is pooled across selected clusters, matching the KB’s distribution guidance.</span></div>
+          <div class="formula-note price-note"><b>Price basis</b><span>Annual reseller subscription pricing, USD, from the Broadcom Americas pricebook effective Nov 2, 2026. New orders use the 96-core minimum shown in the pricebook. vSAN add-ons use VCF-VSAN-8 at $250/TiB/year. Estimates exclude discounts, taxes, and existing entitlements; not a quote.</span></div>
+        </section>
+        <section class="lic-panel cluster-panel">
+          <div class="section-heading"><div><span class="step">04</span><h2>Cluster raw vSAN capacity</h2></div><span class="manual-badge">OPTIONAL · REQUIRED FOR vSAN ADD-ON ESTIMATE</span></div>
+          <p class="section-copy">RVTools datastore and VMDK figures are not raw vSAN capacity for licensing. Enter each selected vSAN cluster’s raw TiB from Broadcom’s license-counting PowerCLI output. Enter 0 for clusters that do not use vSAN; leave unknown capacity blank.</p>
+          <div class="table-scroll"><table><thead><tr><th>Cluster</th><th>Hosts</th><th>Licensed cores</th><th>Raw capacity (TiB)</th><th>Source / confidence</th></tr></thead><tbody id="clusterRows"></tbody></table></div>
+          <div class="capacity-footer"><div><span>Total raw capacity entered</span><strong id="totalRaw">Not provided</strong></div><div><span>Input status</span><strong id="capacityStatus">Awaiting capacity data</strong></div></div>
+        </section>
+        <section class="lic-panel host-panel">
+          <div class="section-heading"><div><span class="step">05</span><h2>Host calculation detail</h2></div><button class="secondary-button" id="downloadReport" type="button">Download CSV report</button></div>
+          <div class="table-scroll"><table><thead><tr><th>vCenter</th><th>Host</th><th>Cluster</th><th>Physical CPUs</th><th>Cores / CPU</th><th>Actual cores</th><th>Licensable cores</th><th>ESXi version</th><th>Rule</th></tr></thead><tbody id="hostRows"></tbody></table></div>
+        </section>
+        <aside id="warnings" class="warning-box is-hidden"></aside>
+      </div>
+      <p class="privacy-note">Files and calculations stay in this browser tab and are not saved. Downloading the CSV is an explicit action.</p>
+      <p class="disclaimer">Planning estimate only; not a quote or licensing determination. Validate host scope, disabled CPU cores, product eligibility, and final vSAN capacity with Broadcom / your VMware reseller. For vSphere 8.0 U3, the article points to <a href="https://knowledge.broadcom.com/external/article/400416" target="_blank" rel="noopener">KB 400416</a> for an updated script. <a href="https://knowledge.broadcom.com/external/article?legacyId=95927#mcetoc_1j18165ti1jn" target="_blank" rel="noopener">Source: Broadcom KB 313548 ↗</a></p>
+    </section>
+  </main>
+</body>
+</html>
