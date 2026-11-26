@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <title>VMware Licensing Planner</title>
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=20261125-host-memory">
   
   
   <script src="./xlsx.full.min.js" defer></script>
-  <script src="./app.js" defer></script>
+  <script src="./app.js?v=20261125-host-memory" defer></script>
 </head>
 <body class="dashboard-home dashboard-light">
   <main class="wrap lic-wrap">
@@ -39,6 +39,7 @@
           <article class="metric-card"><span>Physical sockets</span><strong id="socketCount">—</strong><small>selected hosts</small></article>
           <article class="metric-card"><span>Physical cores</span><strong id="actualCoreCount">—</strong><small>reported by RVTools</small></article>
           <article class="metric-card metric-primary"><span>Core licenses</span><strong id="licensedCoreCount">—</strong><small>16-core minimum per socket</small></article>
+          <article class="metric-card"><span>Physical host memory</span><strong id="hostMemory">—</strong><small id="hostMemoryNote">GiB across selected hosts</small></article>
         </div>
         <section class="lic-panel product-panel">
           <div class="section-heading"><div><span class="step">03</span><h2>Compare foundation options</h2></div><span id="sourceLabel" class="source-label"></span></div>
@@ -58,7 +59,7 @@
         </section>
         <section class="lic-panel host-panel">
           <div class="section-heading"><div><span class="step">05</span><h2>Host calculation detail</h2></div><button class="secondary-button" id="downloadReport" type="button">Download CSV report</button></div>
-          <div class="table-scroll"><table><thead><tr><th>vCenter</th><th>Host</th><th>Cluster</th><th>Physical CPUs</th><th>Cores / CPU</th><th>Actual cores</th><th>Licensable cores</th><th>ESXi version</th><th>Rule</th></tr></thead><tbody id="hostRows"></tbody></table></div>
+          <div class="table-scroll"><table><thead><tr><th>vCenter</th><th>Host</th><th>Cluster</th><th>Physical CPUs</th><th>Cores / CPU</th><th>Actual cores</th><th>Licensable cores</th><th>Host memory (GiB)</th><th>ESXi version</th><th>Rule</th></tr></thead><tbody id="hostRows"></tbody></table></div>
         </section>
         <aside id="warnings" class="warning-box is-hidden"></aside>
       </div>
